@@ -15,7 +15,7 @@ import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import {
   GeneralResponseWithBoolenaData,
   getGeneralResponse,
-} from '../response/boop.dto';
+} from '../response/response.swagger';
 
 @Controller({
   path: 'organization',

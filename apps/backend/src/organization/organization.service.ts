@@ -82,7 +82,7 @@ export class OrganizationService {
       },
       data: {
         name: body.name,
-        updated: new Date(Date.now()),
+        updatedAt: new Date(Date.now()),
       },
     });
 

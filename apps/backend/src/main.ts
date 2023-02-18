@@ -9,15 +9,20 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Updeight Example')
-    .setDescription('The updeight API description')
+    .setTitle('Updeight')
+    .setDescription('The updeight API documentation')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
   const httpAdapter = app.get(HttpAdapterHost);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  );
   app.useGlobalFilters(
     new AllExceptionsFilter(httpAdapter, new ResponseService()),
   );
