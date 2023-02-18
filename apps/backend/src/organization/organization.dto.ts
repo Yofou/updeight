@@ -25,5 +25,5 @@ export class OrganizationDTO implements Organization {
   createdAt: Date;
 
   @ApiProperty({ type: 'string' })
-  updated: Date;
+  updatedAt: Date;
 }
