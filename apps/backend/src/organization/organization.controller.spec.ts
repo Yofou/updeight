@@ -18,7 +18,9 @@ describe('OrganizationController', () => {
       providers: [OrganizationService, PrismaService, ResponseService],
     }).compile();
 
-    organizationController = app.get<OrganizationController>(OrganizationController);
+    organizationController = app.get<OrganizationController>(
+      OrganizationController,
+    );
     prisma = app.get<PrismaService>(PrismaService);
     formater = app.get<ResponseService>(ResponseService);
   });
@@ -38,9 +40,9 @@ describe('OrganizationController', () => {
         prisma.organization.findFirst = jest
           .fn()
           .mockReturnValueOnce(findFirst);
-        await expect(organizationController.read(findFirst.id)).resolves.toMatchObject(
-          response,
-        );
+        await expect(
+          organizationController.read(findFirst.id),
+        ).resolves.toMatchObject(response);
       });
     });
 
