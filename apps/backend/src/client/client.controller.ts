@@ -41,7 +41,7 @@ export class ClientController {
   })
   @Get()
   read(
-    @Query('id') id: string,
+    @Query('id') id?: string,
     @Query('trace-id') trace = randomUUID(),
     @Query('organization') organization?: string,
   ) {
