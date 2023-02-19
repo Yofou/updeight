@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { CreateOrganizationDTO } from './organization.dto';
@@ -61,7 +56,7 @@ export class OrganizationService {
 
     if (!organization) {
       Logger.error('Failed to create an organization', trace);
-      throw new InternalServerErrorException(
+      throw new BadRequestException(
         `Whoops cannot create a organization at this time, try again later`,
       );
     }
@@ -88,7 +83,7 @@ export class OrganizationService {
 
     if (!organization) {
       Logger.error('Failed to update an organization', trace);
-      throw new InternalServerErrorException(
+      throw new BadRequestException(
         `Whoops cannot update a organization at this time, try again later`,
       );
     }
