@@ -4,9 +4,16 @@ import { AppModule } from './app/app.module';
 import { AllExceptionsFilter } from './response/all-exception.filter';
 import { ResponseService } from './response/response.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter({ ignoreTrailingSlash: true }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Updeight')
