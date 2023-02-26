@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { CreateOrganizationDTO } from './organization.dto';
@@ -27,7 +32,7 @@ export class OrganizationService {
 
     if (!response) {
       Logger.error(`Failed to find Organization by ${id}`, trace);
-      throw new BadRequestException(
+      throw new NotFoundException(
         `No Organization was found by this id of ${id}`,
       );
     }
@@ -94,8 +99,6 @@ export class OrganizationService {
 
   async deleteOrganization(id: string, trace: string) {
     Logger.log(`Attempting to delete Organization with the id of ${id}`, trace);
-
-    Logger.debug(id);
     const response = await this.prisma.organization.deleteMany({
       where: {
         id,
