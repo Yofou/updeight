@@ -8,6 +8,9 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import * as secureSession from '@fastify/secure-session';
+import { ConfigService } from '@nestjs/config';
+import { SwaggerTheme } from 'swagger-themes';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -15,13 +18,17 @@ async function bootstrap() {
     new FastifyAdapter({ ignoreTrailingSlash: true }),
   );
 
+  const theme = new SwaggerTheme('v3');
   const config = new DocumentBuilder()
     .setTitle('Updeight')
     .setDescription('The updeight API documentation')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    explorer: true,
+    customCss: theme.getBuffer('dark'),
+  });
 
   const httpAdapter = app.get(HttpAdapterHost);
   app.useGlobalPipes(
@@ -33,6 +40,17 @@ async function bootstrap() {
   app.useGlobalFilters(
     new AllExceptionsFilter(httpAdapter, new ResponseService()),
   );
+
+  const configService = app.get<ConfigService>(ConfigService);
+  await app.register(secureSession, {
+    secret: configService.getOrThrow('APP_SECRET'),
+    salt: configService.getOrThrow('APP_SALT'),
+    cookie: {
+      maxAge: 604800,
+      path: '/',
+    },
+  });
+
   await app.listen(3000);
 }
 

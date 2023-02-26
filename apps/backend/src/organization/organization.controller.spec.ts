@@ -4,7 +4,7 @@ import { OrganizationService } from './organization.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { findFirst } from './organization.mock';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 describe('OrganizationController', () => {
@@ -51,7 +51,7 @@ describe('OrganizationController', () => {
         prisma.organization.findFirst = jest.fn().mockReturnValueOnce(null);
 
         await expect(organizationController.read(findFirst.id)).rejects.toThrow(
-          BadRequestException,
+          NotFoundException,
         );
       });
     });
