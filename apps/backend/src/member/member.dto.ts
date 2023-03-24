@@ -36,7 +36,7 @@ export class UpdateMemberDto
   @ApiProperty({ example: 'wklgxpoqcmaz1!5%' })
   @IsString()
   @IsOptional()
-  password: string;
+  password?: string;
 
   @ApiProperty({ example: 'wklgxpoqcmaz1!5%' })
   @ValidateIf((o) => o.password != undefined)

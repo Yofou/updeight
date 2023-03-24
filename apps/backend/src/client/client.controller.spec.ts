@@ -7,9 +7,8 @@ import { findFirst } from './client.mock';
 import { BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { Prisma } from 'prisma';
-type x = Prisma.PrismaClientKnownRequestError;
 
-describe('OrganizationController', () => {
+describe('ClientController', () => {
   let clientController: ClientController;
   let prisma: PrismaService;
   let formater: ResponseService;
@@ -97,6 +96,7 @@ describe('OrganizationController', () => {
       it('should return success response when update operation is expected', async () => {
         const data = { ...findFirst, name: 'project finance' };
         prisma.client.update = jest.fn().mockReturnValueOnce(data);
+        prisma.organization.count = jest.fn().mockReturnValueOnce(1);
         prisma.client.findFirst = jest
           .fn()
           .mockReturnValueOnce(findFirst.organization);
@@ -120,6 +120,7 @@ describe('OrganizationController', () => {
               { code: 'P-000', clientVersion: 'mock' },
             ),
           );
+        prisma.organization.count = jest.fn().mockReturnValueOnce(1);
         prisma.client.findFirst = jest
           .fn()
           .mockReturnValueOnce(findFirst.organization);

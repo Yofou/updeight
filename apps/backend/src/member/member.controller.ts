@@ -8,7 +8,6 @@ import {
   Put,
   Query,
   Session,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { SessionService } from '../session/session.service';
@@ -85,16 +84,11 @@ export class MemberController {
     if (organizationId) {
       const response = await this.service.getAllOrgMembers(
         organizationId,
+        member,
         trace,
       );
-      const isInOrg = response.data.some(
-        ({ id: memberId }) => memberId === member.id,
-      );
 
-      if (!isInOrg)
-        throw new UnauthorizedException(
-          'Sorry you are not apart of this organization',
-        );
+      return this.formater.formatSucces(response);
     }
 
     return this.formater.formatSucces(member);
@@ -139,7 +133,7 @@ export class MemberController {
     required: false,
   })
   @Post('logout')
-  async(
+  async logout(
     @Session() session: SessionData,
     @Query('trace-id') trace = randomUUID(),
   ) {
