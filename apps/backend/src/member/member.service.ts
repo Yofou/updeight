@@ -15,7 +15,13 @@ import { CronJob } from 'cron';
 
 @Injectable()
 export class MemberService {
-  private selector: Prisma.MemberSelect;
+  private selector: {
+    id: true;
+    name: true;
+    email: true;
+    createdAt: true;
+    updatedAt: true;
+  };
   constructor(
     private prisma: PrismaService,
     private formater: ResponseService,
@@ -51,7 +57,11 @@ export class MemberService {
     return this.formater.formatSucces(response);
   }
 
-  async getAllOrgMembers(id: string, trace: string) {
+  async getAllOrgMembers(
+    id: string,
+    member: Omit<Member, 'password'>,
+    trace: string,
+  ) {
     Logger.log(
       `Attempting to read all members from the orgization ${id}`,
       trace,
@@ -68,12 +78,18 @@ export class MemberService {
       select: this.selector,
     });
 
+    const isInOrg = members.some(({ id: memberId }) => memberId === member.id);
+    if (!isInOrg)
+      throw new UnauthorizedException(
+        'Sorry you are not apart of this organization',
+      );
+
     Logger.log(
       `Successfuly read all membwers from the organization ${id}`,
       trace,
     );
     Logger.debug(members);
-    return this.formater.formatSucces(members);
+    return members;
   }
 
   async createMember(body: CreateMemberDto, trace: string) {
@@ -83,7 +99,7 @@ export class MemberService {
       data: { ...body, password: await hash(body.password) },
       select: this.selector,
     });
-    Logger.log('Succesfully created a memmber', trace);
+    Logger.log('Succesfully created a member', trace);
 
     Logger.log(
       `Attempting to create a session with the member ${member.id}`,
@@ -137,7 +153,7 @@ export class MemberService {
         `Failed validation on if user can performe an update on ${id}`,
         trace,
       );
-      throw new BadRequestException('you cannot update this member');
+      throw new UnauthorizedException('you cannot update this member');
     }
 
     Logger.log(`Attempting to update the user id ${id}`, trace);

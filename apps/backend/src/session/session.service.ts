@@ -78,7 +78,7 @@ export class SessionService {
     if (!member) {
       throw new NotFoundException('Member not found by that email/password');
     }
-    Logger.log(`Found to find member by email ${body.email}`, trace);
+    Logger.log(`Found member by email ${body.email}`, trace);
 
     const isValidPassword = await verify(member.password, body.password);
     if (!isValidPassword) {
