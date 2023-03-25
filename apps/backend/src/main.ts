@@ -51,6 +51,7 @@ async function bootstrap() {
     },
   });
 
+  console.log(configService.get('PORT') || 3000);
   await app.listen(configService.get('PORT') || 3000);
 }
 
