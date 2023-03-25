@@ -10,6 +10,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "build": "prisma generate"
+  },
   "devDependencies": {
     "@types/node": "18.11.18",
     "prisma": "^4.10.1",

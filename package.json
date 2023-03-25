@@ -9,7 +9,7 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "start:backend": "turbo run build --filter=backend && cd ./apps/backend && npm run start:prod",
+    "start:backend": "turbo run build --filter=backend --filter=prisma && cd ./apps/backend && npm run start:prod",
     "start:frontend": "turbo run build --filter=frontend && cd ./apps/frontend && npm run start:prod",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
