@@ -14,6 +14,9 @@
     },
     "backend#build": {
       "dependsOn": ["prisma#build"]
+    },
+    "prisma#build": {
+      "cache": false
     }
   }
 }
