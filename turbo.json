@@ -15,9 +15,6 @@
     "backend#build": {
       "dependsOn": ["prisma#build"]
     },
-    "backend#start:backend": {
-      "dependsOn": ["prisma#migrate"]
-    },
     "prisma#build": {
       "cache": false
     }
