@@ -37,39 +37,6 @@ export class SessionService {
     };
   }
 
-  async getMember(sessionId: string, trace: string) {
-    Logger.log(`Attempting to find session with the id of ${sessionId}`, trace);
-    const response = await this.prisma.session.findFirst({
-      where: {
-        id: sessionId ?? '',
-      },
-      select: {
-        id: true,
-        member: {
-          select: this.selector,
-        },
-      },
-    });
-
-    Logger.log(
-      `Successfully found member with session id of ${sessionId}`,
-      trace,
-    );
-    Logger.debug(response?.member, trace);
-    return response?.member;
-  }
-
-  ifNullThrow(
-    condition: boolean,
-    trace: string,
-    message = 'Session not found, please login.',
-  ) {
-    if (condition) {
-      Logger.error(`Session not found / is invalid. throwing error`, trace);
-      throw new UnauthorizedException(message);
-    }
-  }
-
   async loginMember(body: LoginMemberDto, trace: string) {
     Logger.log(`Attempting to find member by email ${body.email}`, trace);
     const member = await this.prisma.member.findFirst({

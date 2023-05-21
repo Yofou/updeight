@@ -103,7 +103,7 @@ export class ClientController {
     type: GeneralResponseWithBooleanData,
   })
   del(@Query('id') id: string, @Query('trace-id') trace = randomUUID()) {
-    Logger.log('Hitting the DELETE operati on on clients', trace);
+    Logger.log('Hitting the DELETE operation on on clients', trace);
     return this.clientService.delete(id, trace);
   }
 }

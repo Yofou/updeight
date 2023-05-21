@@ -30,6 +30,8 @@ import {
   GeneralResponseWithBooleanData,
   getGeneralResponse,
 } from '../response/response.swagger';
+import { Member } from '../decorator/member.decorator';
+import { MemberWithOrg } from '../session/session.types';
 
 @Controller({
   path: 'member',
@@ -68,17 +70,12 @@ export class MemberController {
   })
   @Get()
   async read(
-    @Session() session: SessionData,
+    @Member() member: MemberWithOrg,
     @Query('id') id?: string,
     @Query('organization') organizationId?: string,
     @Query('trace-id') trace = randomUUID(),
   ) {
     Logger.log('Hitting READ operation on member', trace);
-    const member = await this.sessionService.getMember(
-      session.get('id'),
-      trace,
-    );
-    this.sessionService.ifNullThrow(!member, trace);
 
     if (id) return this.service.getByMemberById(id, trace);
     if (organizationId) {
@@ -189,18 +186,12 @@ export class MemberController {
   })
   @Put()
   async update(
-    @Session() session: SessionData,
+    @Member() member: MemberWithOrg,
     @Query('id') id: string,
     @Query('trace-id') trace = randomUUID(),
     @Body() body: UpdateMemberDto,
   ) {
     Logger.log('Hitting the UPDATE operation on member', trace);
-    const member = await this.sessionService.getMember(
-      session.get('id'),
-      trace,
-    );
-    this.sessionService.ifNullThrow(!member, trace);
-
     return this.service.updateMember(id, body, member, trace);
   }
 
@@ -225,16 +216,11 @@ export class MemberController {
   @Delete()
   async del(
     @Session() session: SessionData,
+    @Member() member: MemberWithOrg,
     @Query('id') id?: string,
     @Query('trace-id') trace = randomUUID(),
   ) {
     Logger.log('Hitting the DELETE operation on member', trace);
-    const member = await this.sessionService.getMember(
-      session.get('id'),
-      trace,
-    );
-    this.sessionService.ifNullThrow(!member, trace);
-
     await this.sessionService.del(session.get('id'), trace);
     session.delete();
 

@@ -4,7 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { MemberWithOrg } from 'src/session/session.types';
+import { MemberWithOrg } from '../session/session.types';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { CreateOrganizationDTO } from './organization.dto';

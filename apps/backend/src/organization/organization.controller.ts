@@ -8,7 +8,6 @@ import {
   Post,
   Put,
   Query,
-  Session,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CreateOrganizationDTO, OrganizationDTO } from './organization.dto';
@@ -18,17 +17,16 @@ import {
   GeneralResponseWithBooleanData,
   getGeneralResponse,
 } from '../response/response.swagger';
-import { SessionService } from '../session/session.service';
-import { Session as SessionData } from '@fastify/secure-session';
 import { ResponseService } from '../response/response.service';
+import { Member } from '../decorator/member.decorator';
+import { MemberWithOrg } from '../session/session.types';
 
 @Controller({
   path: 'organization',
 })
 export class OrganizationController {
   constructor(
-    private readonly orgService: OrganizationService,
-    private sessionService: SessionService,
+    private orgService: OrganizationService,
     private formatterService: ResponseService,
   ) {}
 
@@ -52,18 +50,11 @@ export class OrganizationController {
   })
   @Get()
   async read(
-    @Session() session: SessionData,
+    @Member() member: MemberWithOrg,
     @Query('id') id?: string,
     @Query('trace-id') trace: string = randomUUID(),
   ) {
     Logger.log('Hitting READ operation on Organization', trace);
-
-    const member = await this.sessionService.getMember(
-      session.get('id'),
-      trace,
-    );
-    this.sessionService.ifNullThrow(!member, trace);
-
     if (id) return this.orgService.getById(id, member, trace);
     return this.orgService.getAll(member, trace);
   }
@@ -131,16 +122,11 @@ export class OrganizationController {
 
   @Post('/join/:inviteCode')
   async join(
-    @Session() session: SessionData,
+    @Member() member: MemberWithOrg,
     @Param('inviteCode') inviteCode: string,
     @Query('trace-id') trace = randomUUID(),
   ) {
     Logger.log('Hitting POST JOIN operation on Organization', trace);
-    const member = await this.sessionService.getMember(
-      session.get('id'),
-      trace,
-    );
-
     await this.orgService.joinOrg(member, inviteCode, trace);
     return this.formatterService.formatSuccess('success');
   }
