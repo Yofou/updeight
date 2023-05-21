@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
-import { GeneralResponseWithBoolenaData } from '../response/response.swagger';
+import { GeneralResponseWithBooleanData } from '../response/response.swagger';
 import { CreateClientDto, UpdateClientDto } from './client.dto';
 import { ClientService } from './client.service';
 import { ClientResponse } from './client.swagger';
@@ -100,7 +100,7 @@ export class ClientController {
     summary: `Deletes a client a record`,
   })
   @ApiResponse({
-    type: GeneralResponseWithBoolenaData,
+    type: GeneralResponseWithBooleanData,
   })
   del(@Query('id') id: string, @Query('trace-id') trace = randomUUID()) {
     Logger.log('Hitting the DELETE operati on on clients', trace);

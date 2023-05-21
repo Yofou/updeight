@@ -9,7 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { CreateMemberDto, UpdateMemberDto } from './member.dto';
 import { hash } from 'argon2';
-import { Member, Prisma } from 'prisma';
+import { Member } from 'prisma';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 
@@ -24,7 +24,7 @@ export class MemberService {
   };
   constructor(
     private prisma: PrismaService,
-    private formater: ResponseService,
+    private formatter: ResponseService,
     private schedulerRegistry: SchedulerRegistry,
   ) {
     this.selector = {
@@ -52,9 +52,9 @@ export class MemberService {
       );
     }
 
-    Logger.log(`Succesfully got the member record by the id of ${id}`, trace);
+    Logger.log(`Successfully got the member record by the id of ${id}`, trace);
     Logger.debug(response, trace);
-    return this.formater.formatSucces(response);
+    return this.formatter.formatSuccess(response);
   }
 
   async getAllOrgMembers(
@@ -63,7 +63,7 @@ export class MemberService {
     trace: string,
   ) {
     Logger.log(
-      `Attempting to read all members from the orgization ${id}`,
+      `Attempting to read all members from the organization ${id}`,
       trace,
     );
 
@@ -85,7 +85,7 @@ export class MemberService {
       );
 
     Logger.log(
-      `Successfuly read all membwers from the organization ${id}`,
+      `Successfully read all members from the organization ${id}`,
       trace,
     );
     Logger.debug(members);
@@ -99,7 +99,7 @@ export class MemberService {
       data: { ...body, password: await hash(body.password) },
       select: this.selector,
     });
-    Logger.log('Succesfully created a member', trace);
+    Logger.log('Successfully created a member', trace);
 
     Logger.log(
       `Attempting to create a session with the member ${member.id}`,
@@ -113,7 +113,7 @@ export class MemberService {
         expiresAt,
       },
     });
-    Logger.log('Succesfully created session', trace);
+    Logger.log('Successfully created session', trace);
 
     const job = new CronJob(expiresAt, async () => {
       const sessionId = session.id;
@@ -150,7 +150,7 @@ export class MemberService {
     );
     if (member.id !== id) {
       Logger.error(
-        `Failed validation on if user can performe an update on ${id}`,
+        `Failed validation on if user can perform an update on ${id}`,
         trace,
       );
       throw new UnauthorizedException('you cannot update this member');
@@ -165,9 +165,9 @@ export class MemberService {
       select: this.selector,
     });
 
-    Logger.log(`Succesfully updated the user id of ${id}`, trace);
+    Logger.log(`Successfully updated the user id of ${id}`, trace);
     Logger.debug(newMember);
-    return this.formater.formatSucces(newMember);
+    return this.formatter.formatSuccess(newMember);
   }
 
   async delMember(id: string, member: Omit<Member, 'password'>, trace: string) {
@@ -183,7 +183,7 @@ export class MemberService {
       throw new UnauthorizedException('You cannot delete this member');
     }
 
-    Logger.log(`Attemtping to delete the member of id ${id}`, trace);
+    Logger.log(`Attempting to delete the member of id ${id}`, trace);
     const response = await this.prisma.member.deleteMany({
       where: {
         id,
@@ -195,7 +195,7 @@ export class MemberService {
       throw new NotFoundException('Member by the id of ${id} was not found');
     }
 
-    Logger.log(`Deletion of member ${id} was succesful`, trace);
-    return this.formater.formatSucces(true);
+    Logger.log(`Deletion of member ${id} was successful`, trace);
+    return this.formatter.formatSuccess(true);
   }
 }

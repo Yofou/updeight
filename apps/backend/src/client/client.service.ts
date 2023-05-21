@@ -9,7 +9,7 @@ export class ClientService {
   private select: Prisma.ClientSelect;
   constructor(
     private prisma: PrismaService,
-    private formater: ResponseService,
+    private formatter: ResponseService,
   ) {
     this.select = {
       id: true,
@@ -27,8 +27,8 @@ export class ClientService {
       select: this.select,
     });
 
-    Logger.log('Succesfully got all clients', trace);
-    return this.formater.formatSucces(response);
+    Logger.log('Successfully got all clients', trace);
+    return this.formatter.formatSuccess(response);
   }
 
   async getOneById(id: string, trace: string) {
@@ -45,8 +45,8 @@ export class ClientService {
       throw new BadRequestException(`Cannot find a client by that id of ${id}`);
     }
 
-    Logger.log(`Successfuly found the client of id of ${id}`, trace);
-    return this.formater.formatSucces(response);
+    Logger.log(`Successfully found the client of id of ${id}`, trace);
+    return this.formatter.formatSuccess(response);
   }
 
   async getAllByOrganizationId(id: string, trace: string) {
@@ -61,8 +61,8 @@ export class ClientService {
       select: this.select,
     });
 
-    Logger.log(`Successfuly found the clients with organization id of ${id}`);
-    return this.formater.formatSucces(response);
+    Logger.log(`Successfully found the clients with organization id of ${id}`);
+    return this.formatter.formatSuccess(response);
   }
 
   async create(body: CreateClientDto, trace: string) {
@@ -72,12 +72,12 @@ export class ClientService {
       select: this.select,
     });
 
-    Logger.log('Succesfully create a client', trace);
-    return this.formater.formatSucces(response);
+    Logger.log('Successfully create a client', trace);
+    return this.formatter.formatSuccess(response);
   }
 
   async doesOrgExist(id: string, trace: string) {
-    Logger.log('Checking if orgnization of ${id} exists', trace);
+    Logger.log('Checking if organization of ${id} exists', trace);
     const count = await this.prisma.organization.count({
       where: {
         id,
@@ -102,8 +102,8 @@ export class ClientService {
       select: this.select,
     });
 
-    Logger.log('Succesfully create a client', trace);
-    return this.formater.formatSucces(response);
+    Logger.log('Successfully create a client', trace);
+    return this.formatter.formatSuccess(response);
   }
 
   async delete(id: string, trace: string) {
@@ -121,7 +121,7 @@ export class ClientService {
       );
     }
 
-    Logger.log(`Successfuly deleted a client with the id of ${id}`, trace);
-    return this.formater.formatSucces(true);
+    Logger.log(`Successfully deleted a client with the id of ${id}`, trace);
+    return this.formatter.formatSuccess(true);
   }
 }

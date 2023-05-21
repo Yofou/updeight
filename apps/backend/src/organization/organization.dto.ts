@@ -19,7 +19,7 @@ export class OrganizationDTO implements Organization {
   name: string;
 
   @ApiProperty()
-  invite_code: string;
+  inviteCode: string;
 
   @ApiProperty({ type: 'string' })
   createdAt: Date;

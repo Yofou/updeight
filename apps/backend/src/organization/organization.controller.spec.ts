@@ -4,25 +4,35 @@ import { OrganizationService } from './organization.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { findFirst } from './organization.mock';
+import { findFirst as findFirstMember } from '../member/member.mock';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { getSessionMock } from '../session/session.mock';
+import { SessionService } from '../session/session.service';
+import { SchedulerRegistry } from '@nestjs/schedule';
 
 describe('OrganizationController', () => {
   let organizationController: OrganizationController;
   let prisma: PrismaService;
-  let formater: ResponseService;
+  let formatter: ResponseService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [OrganizationController],
-      providers: [OrganizationService, PrismaService, ResponseService],
+      providers: [
+        OrganizationService,
+        PrismaService,
+        ResponseService,
+        SessionService,
+        SchedulerRegistry,
+      ],
     }).compile();
 
     organizationController = app.get<OrganizationController>(
       OrganizationController,
     );
     prisma = app.get<PrismaService>(PrismaService);
-    formater = app.get<ResponseService>(ResponseService);
+    formatter = app.get<ResponseService>(ResponseService);
   });
 
   describe('read', () => {
@@ -30,43 +40,60 @@ describe('OrganizationController', () => {
       it('should return all organizations, aka an array', async () => {
         const response = [];
         prisma.organization.findMany = jest.fn().mockReturnValueOnce([]);
-        await expect(organizationController.read()).resolves.toMatchObject(
-          formater.formatSucces(response),
-        );
+        prisma.session.findFirst = jest
+          .fn()
+          .mockReturnValueOnce({ member: findFirstMember });
+        await expect(
+          organizationController.read(
+            getSessionMock({ get: { id: 'test id' } }),
+          ),
+        ).resolves.toMatchObject(formatter.formatSuccess(response));
       });
 
       it('should return find organizations with id', async () => {
-        const response = formater.formatSucces(findFirst);
+        const response = formatter.formatSuccess(findFirst);
         prisma.organization.findFirst = jest
           .fn()
           .mockReturnValueOnce(findFirst);
+        prisma.session.findFirst = jest
+          .fn()
+          .mockReturnValueOnce({ member: findFirstMember });
         await expect(
-          organizationController.read(findFirst.id),
+          organizationController.read(
+            getSessionMock({ get: { id: 'test id' } }),
+            findFirst.id,
+          ),
         ).resolves.toMatchObject(response);
       });
     });
 
     describe('negative', () => {
-      it('should throw a bad request if we cannot find a orgnaization by id', async () => {
+      it('should throw a bad request if we cannot find a organization by id', async () => {
         prisma.organization.findFirst = jest.fn().mockReturnValueOnce(null);
+        prisma.session.findFirst = jest
+          .fn()
+          .mockReturnValueOnce({ member: findFirstMember });
 
-        await expect(organizationController.read(findFirst.id)).rejects.toThrow(
-          NotFoundException,
-        );
+        await expect(
+          organizationController.read(
+            getSessionMock({ get: { id: 'test id' } }),
+            findFirst.id,
+          ),
+        ).rejects.toThrow(NotFoundException);
       });
     });
   });
 
   describe('create', () => {
     describe('positive', () => {
-      it('should return back formated success on create', async () => {
+      it('should return back formatted success on create', async () => {
         prisma.organization.create = jest.fn().mockReturnValueOnce(findFirst);
 
         await expect(
           organizationController.create(randomUUID(), {
             name: findFirst.name,
           }),
-        ).resolves.toMatchObject(formater.formatSucces(findFirst));
+        ).resolves.toMatchObject(formatter.formatSuccess(findFirst));
       });
     });
 
@@ -91,7 +118,7 @@ describe('OrganizationController', () => {
           organizationController.update(findFirst.id, randomUUID(), {
             name: 'project finance',
           }),
-        ).resolves.toMatchObject(formater.formatSucces(data));
+        ).resolves.toMatchObject(formatter.formatSuccess(data));
       });
     });
 
@@ -110,14 +137,14 @@ describe('OrganizationController', () => {
 
   describe('delete', () => {
     describe('positive', () => {
-      it('should return true if succesfully deleted', async () => {
+      it('should return true if successfully deleted', async () => {
         prisma.organization.deleteMany = jest
           .fn()
           .mockReturnValueOnce({ count: 1 });
 
         await expect(
           organizationController.del(findFirst.id, randomUUID()),
-        ).resolves.toMatchObject(formater.formatSucces(true));
+        ).resolves.toMatchObject(formatter.formatSuccess(true));
       });
     });
 
@@ -129,7 +156,7 @@ describe('OrganizationController', () => {
 
         await expect(
           organizationController.del(findFirst.id, randomUUID()),
-        ).rejects.toThrow(BadRequestException);
+        ).rejects.toThrow(NotFoundException);
       });
     });
   });

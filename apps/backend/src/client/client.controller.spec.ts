@@ -11,7 +11,7 @@ import { Prisma } from 'prisma';
 describe('ClientController', () => {
   let clientController: ClientController;
   let prisma: PrismaService;
-  let formater: ResponseService;
+  let formatter: ResponseService;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
@@ -21,7 +21,7 @@ describe('ClientController', () => {
 
     clientController = app.get<ClientController>(ClientController);
     prisma = app.get<PrismaService>(PrismaService);
-    formater = app.get<ResponseService>(ResponseService);
+    formatter = app.get<ResponseService>(ResponseService);
   });
 
   describe('read', () => {
@@ -30,12 +30,12 @@ describe('ClientController', () => {
         const response = [];
         prisma.client.findMany = jest.fn().mockReturnValueOnce([]);
         await expect(clientController.read()).resolves.toMatchObject(
-          formater.formatSucces(response),
+          formatter.formatSuccess(response),
         );
       });
 
       it('should return find clients with id', async () => {
-        const response = formater.formatSucces(findFirst);
+        const response = formatter.formatSuccess(findFirst);
         prisma.client.findFirst = jest.fn().mockReturnValueOnce(findFirst);
         await expect(
           clientController.read(findFirst.id),
@@ -44,7 +44,7 @@ describe('ClientController', () => {
     });
 
     describe('negative', () => {
-      it('should throw a bad request if we cannot find a orgnaization by id', async () => {
+      it('should throw a bad request if we cannot find a organization by id', async () => {
         prisma.client.findFirst = jest.fn().mockReturnValueOnce(null);
 
         await expect(clientController.read(findFirst.id)).rejects.toThrow(
@@ -56,7 +56,7 @@ describe('ClientController', () => {
 
   describe('create', () => {
     describe('positive', () => {
-      it('should return back formated success on create', async () => {
+      it('should return back formatted success on create', async () => {
         prisma.client.create = jest.fn().mockReturnValueOnce(findFirst);
 
         await expect(
@@ -65,7 +65,7 @@ describe('ClientController', () => {
             organizationId: randomUUID(),
             thumbnail: 'rick roll',
           }),
-        ).resolves.toMatchObject(formater.formatSucces(findFirst));
+        ).resolves.toMatchObject(formatter.formatSuccess(findFirst));
       });
     });
 
@@ -106,7 +106,7 @@ describe('ClientController', () => {
             name: 'project finance',
             thumbnail: 'rich roll',
           }),
-        ).resolves.toMatchObject(formater.formatSucces(data));
+        ).resolves.toMatchObject(formatter.formatSuccess(data));
       });
     });
 
@@ -137,12 +137,12 @@ describe('ClientController', () => {
 
   describe('delete', () => {
     describe('positive', () => {
-      it('should return true if succesfully deleted', async () => {
+      it('should return true if successfully deleted', async () => {
         prisma.client.deleteMany = jest.fn().mockReturnValueOnce({ count: 1 });
 
         await expect(
           clientController.del(findFirst.id, randomUUID()),
-        ).resolves.toMatchObject(formater.formatSucces(true));
+        ).resolves.toMatchObject(formatter.formatSuccess(true));
       });
     });
 

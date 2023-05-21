@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Tracker" ALTER COLUMN "createdFor" SET DATA TYPE TIMESTAMPTZ;

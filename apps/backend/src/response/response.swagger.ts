@@ -8,7 +8,7 @@ export class OperationStatusResponse {
   message?: string;
 }
 
-export class GeneralResponseWithBoolenaData {
+export class GeneralResponseWithBooleanData {
   @ApiProperty({ type: 'boolean' })
   data: boolean;
 

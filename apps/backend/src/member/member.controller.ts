@@ -27,7 +27,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import {
-  GeneralResponseWithBoolenaData,
+  GeneralResponseWithBooleanData,
   getGeneralResponse,
 } from '../response/response.swagger';
 
@@ -38,7 +38,7 @@ export class MemberController {
   constructor(
     private service: MemberService,
     private sessionService: SessionService,
-    private formater: ResponseService,
+    private formatter: ResponseService,
   ) {}
 
   @ApiOperation({
@@ -88,10 +88,10 @@ export class MemberController {
         trace,
       );
 
-      return this.formater.formatSucces(response);
+      return this.formatter.formatSuccess(response);
     }
 
-    return this.formater.formatSucces(member);
+    return this.formatter.formatSuccess(member);
   }
 
   @ApiOperation({
@@ -116,7 +116,7 @@ export class MemberController {
     const response = await this.sessionService.loginMember(body, trace);
 
     session.set('id', response.id);
-    return this.formater.formatSucces(response.member);
+    return this.formatter.formatSuccess(response.member);
   }
 
   @ApiOperation({
@@ -125,7 +125,7 @@ export class MemberController {
   @ApiCookieAuth('session')
   @ApiResponse({
     description: 'should return a boolean response',
-    type: GeneralResponseWithBoolenaData,
+    type: GeneralResponseWithBooleanData,
   })
   @ApiQuery({
     name: 'trace-id',
@@ -166,7 +166,7 @@ export class MemberController {
     const response = await this.service.createMember(body, trace);
 
     session.set('id', response.id);
-    return this.formater.formatSucces(response.member);
+    return this.formatter.formatSuccess(response.member);
   }
 
   @ApiOperation({
@@ -209,8 +209,8 @@ export class MemberController {
   })
   @ApiCookieAuth('session')
   @ApiResponse({
-    description: 'should return the bolean response if membership was deleted',
-    type: GeneralResponseWithBoolenaData,
+    description: 'should return the boolean response if membership was deleted',
+    type: GeneralResponseWithBooleanData,
   })
   @ApiQuery({
     name: 'id',

@@ -19,7 +19,7 @@ import { mockDeep } from 'jest-mock-extended';
 describe('MemberController', () => {
   let memberController: MemberController;
   let prisma: PrismaService;
-  let formater: ResponseService;
+  let formatter: ResponseService;
   const baseMockSessionData = {
     get: {
       id: findFirst.id,
@@ -38,7 +38,7 @@ describe('MemberController', () => {
 
     memberController = app.get<MemberController>(MemberController);
     prisma = app.get<PrismaService>(PrismaService);
-    formater = app.get<ResponseService>(ResponseService);
+    formatter = app.get<ResponseService>(ResponseService);
   });
 
   describe('read', () => {
@@ -50,11 +50,11 @@ describe('MemberController', () => {
         prisma.session.findFirst = jest.fn().mockReturnValueOnce(response);
         await expect(
           memberController.read(getSessionMock(baseMockSessionData)),
-        ).resolves.toMatchObject(formater.formatSucces(response.member));
+        ).resolves.toMatchObject(formatter.formatSuccess(response.member));
       });
 
       it('should return find member with id', async () => {
-        const response = formater.formatSucces(findFirst);
+        const response = formatter.formatSuccess(findFirst);
         prisma.session.findFirst = jest
           .fn()
           .mockReturnValueOnce({ member: findFirst });
@@ -68,7 +68,7 @@ describe('MemberController', () => {
       });
 
       it('should return all the members from an organization', async () => {
-        const response = formater.formatSucces([findFirst]);
+        const response = formatter.formatSuccess([findFirst]);
         prisma.member.findFirst = jest.fn().mockReturnValue(findFirst);
         prisma.session.findFirst = jest
           .fn()
@@ -140,7 +140,7 @@ describe('MemberController', () => {
               password: 'secure password',
             },
           ),
-        ).toMatchObject(formater.formatSucces(findFirst));
+        ).toMatchObject(formatter.formatSuccess(findFirst));
       });
     });
 
@@ -198,7 +198,7 @@ describe('MemberController', () => {
             getSessionMock(baseMockSessionData),
             undefined,
           ),
-        ).resolves.toMatchObject(formater.formatSucces(true));
+        ).resolves.toMatchObject(formatter.formatSuccess(true));
       });
     });
   });
@@ -219,7 +219,7 @@ describe('MemberController', () => {
               password: 'secure password',
             },
           ),
-        ).toMatchObject(formater.formatSucces(findFirst));
+        ).toMatchObject(formatter.formatSuccess(findFirst));
       });
     });
   });
@@ -242,7 +242,7 @@ describe('MemberController', () => {
               name: updatedFindFirst.name,
             },
           ),
-        ).toMatchObject(formater.formatSucces(updatedFindFirst));
+        ).toMatchObject(formatter.formatSuccess(updatedFindFirst));
       });
     });
 
@@ -285,7 +285,7 @@ describe('MemberController', () => {
             undefined,
             undefined,
           ),
-        ).toMatchObject(formater.formatSucces(true));
+        ).toMatchObject(formatter.formatSuccess(true));
       });
 
       it("should delete it's another member & session if an id provided", async () => {
@@ -302,7 +302,7 @@ describe('MemberController', () => {
             findFirst.id,
             undefined,
           ),
-        ).toMatchObject(formater.formatSucces(true));
+        ).toMatchObject(formatter.formatSuccess(true));
       });
     });
 

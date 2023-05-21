@@ -5,6 +5,7 @@ const Page: React.FC = () => {
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
       <Button primary label={'testing'} />
       <h1>Welcome to Remix</h1>
+      <h2>Baskat</h2>
       <ul>
         <li>
           <a

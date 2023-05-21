@@ -4,6 +4,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { MemberWithOrg } from 'src/session/session.types';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { CreateOrganizationDTO } from './organization.dto';
@@ -12,33 +13,59 @@ import { CreateOrganizationDTO } from './organization.dto';
 export class OrganizationService {
   constructor(
     private prisma: PrismaService,
-    private formater: ResponseService,
+    private formatter: ResponseService,
   ) {}
 
-  async getAll(traceId: string) {
+  async getAll(member: MemberWithOrg, traceId: string) {
     Logger.log('Getting all organizations', traceId);
-    const response = await this.prisma.organization.findMany();
-    Logger.log('Succesfully got all organizations', traceId);
-    return this.formater.formatSucces(response);
+    const response = await this.prisma.organization.findMany({
+      where: {
+        members: {
+          some: {
+            id: member.id,
+          },
+        },
+      },
+    });
+    Logger.log('Successfully got all organizations', traceId);
+    return this.formatter.formatSuccess(response);
   }
 
-  async getById(id: string, trace: string) {
+  async getById(id: string, member: MemberWithOrg, trace: string) {
     Logger.log(`Grabbing organization by id of ${id}`, trace);
     const response = await this.prisma.organization.findFirst({
       where: {
         id,
+        members: {
+          some: {
+            id: member.id,
+          },
+        },
+      },
+      include: {
+        members: {
+          select: {
+            id: true,
+            name: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
       },
     });
 
     if (!response) {
-      Logger.error(`Failed to find Organization by ${id}`, trace);
+      Logger.error(
+        `Failed to find Organization by ${id} or you're not apart of this organization`,
+        trace,
+      );
       throw new NotFoundException(
-        `No Organization was found by this id of ${id}`,
+        `No Organization was found by this id of ${id} or you're not apart of this organization`,
       );
     }
 
-    Logger.log(`Succesfully found organization record by ${id}`, trace);
-    return this.formater.formatSucces(response);
+    Logger.log(`Successfully found organization record by ${id}`, trace);
+    return this.formatter.formatSuccess(response);
   }
 
   genInvite() {
@@ -51,11 +78,11 @@ export class OrganizationService {
   }
 
   async createOrganization(body: CreateOrganizationDTO, trace: string) {
-    Logger.log('Attemping to create an organization', trace);
+    Logger.log('Attempting to create an organization', trace);
     const organization = await this.prisma.organization.create({
       data: {
         name: body.name,
-        invite_code: this.genInvite(),
+        inviteCode: this.genInvite(),
       },
     });
 
@@ -67,7 +94,7 @@ export class OrganizationService {
     }
 
     Logger.log('Success to create an organization', trace);
-    return this.formater.formatSucces(organization);
+    return this.formatter.formatSuccess(organization);
   }
 
   async updateOrganization(
@@ -75,7 +102,7 @@ export class OrganizationService {
     body: CreateOrganizationDTO,
     trace: string,
   ) {
-    Logger.log(`Attemping to update an organization with id of ${id}`, trace);
+    Logger.log(`Attempting to update an organization with id of ${id}`, trace);
     const organization = await this.prisma.organization.update({
       where: {
         id,
@@ -94,7 +121,7 @@ export class OrganizationService {
     }
 
     Logger.log(`Success to update an organization with the id of ${id}`, trace);
-    return this.formater.formatSucces(organization);
+    return this.formatter.formatSuccess(organization);
   }
 
   async deleteOrganization(id: string, trace: string) {
@@ -110,11 +137,37 @@ export class OrganizationService {
         `Failed to delete an organization with the id of ${id}`,
         trace,
       );
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Cannot find an organization to delete with the id of ${id}`,
       );
     }
 
-    return this.formater.formatSucces(true);
+    return this.formatter.formatSuccess(true);
+  }
+
+  async joinOrg(member: MemberWithOrg, inviteCode: string, trace: string) {
+    Logger.log(
+      `Attempting to find and connect member of id ${member.id} with invite code of ${inviteCode}`,
+      trace,
+    );
+    const org = await this.prisma.organization.update({
+      where: {
+        inviteCode: inviteCode,
+      },
+      data: {
+        members: {
+          connect: [{ id: member.id }],
+        },
+      },
+    });
+
+    if (!org) {
+      const message = `Failed to find organization with the invite of ${inviteCode}`;
+      Logger.error(message, trace);
+
+      throw new BadRequestException(message);
+    }
+
+    return true;
   }
 }

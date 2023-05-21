@@ -6,6 +6,7 @@ import { OrganizationModule } from '../organization/organization.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MemberModule } from '../member/member.module';
+import { TrackerModule } from '../tracker/tracker.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { MemberModule } from '../member/member.module';
     ResponseModule,
     ClientModule,
     MemberModule,
+    TrackerModule,
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],

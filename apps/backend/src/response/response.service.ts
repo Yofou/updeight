@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 export interface UpdeightResponse<T> {
   data: T;
-  operation_status: {
+  operationStatus: {
     isSuccess: boolean;
     message?: string;
   };
@@ -13,17 +13,17 @@ export class ResponseService {
   private format<T>(data: T, isSuccess: boolean, message?: string) {
     const response: UpdeightResponse<T> = {
       data,
-      operation_status: {
+      operationStatus: {
         isSuccess,
       },
     };
 
-    if (message) response.operation_status.message = message;
+    if (message) response.operationStatus.message = message;
 
     return response;
   }
 
-  formatSucces<T>(data: T) {
+  formatSuccess<T>(data: T) {
     return this.format(data, true);
   }
 

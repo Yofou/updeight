@@ -14,15 +14,17 @@ import { CronJob } from 'cron';
 @Injectable()
 export class SessionService {
   selector: {
-    id: true;
-    name: true;
-    email: true;
-    createdAt: true;
-    updatedAt: true;
+    id: boolean;
+    name: boolean;
+    email: boolean;
+    createdAt: boolean;
+    updatedAt: boolean;
+    organizations: boolean;
   };
+
   constructor(
     private prisma: PrismaService,
-    private formater: ResponseService,
+    private formatter: ResponseService,
     private schedulerRegistry: SchedulerRegistry,
   ) {
     this.selector = {
@@ -31,6 +33,7 @@ export class SessionService {
       email: true,
       createdAt: true,
       updatedAt: true,
+      organizations: true,
     };
   }
 
@@ -49,7 +52,7 @@ export class SessionService {
     });
 
     Logger.log(
-      `Succesfully found member with session id of ${sessionId}`,
+      `Successfully found member with session id of ${sessionId}`,
       trace,
     );
     Logger.debug(response?.member, trace);
@@ -126,11 +129,11 @@ export class SessionService {
       },
     });
 
-    Logger.log(`Succesfully delete all sessions with the id of ${id}`, trace);
-    return this.formater.formatSucces(true);
+    Logger.log(`Successfully delete all sessions with the id of ${id}`, trace);
+    return this.formatter.formatSuccess(true);
   }
 
-  // We do a clean up function everyone once in a while to ensure we delete session that are suppose to be excpried
+  // We do a clean up function everyone once in a while to ensure we delete session that are suppose to be expired
   @Cron('0 0 23 * * *')
   async cleanUpSession() {
     const response = await this.prisma.session.deleteMany({

@@ -19,6 +19,7 @@ model Member {
   password String
   organizations Organization[]
   sessions Session[]
+  tracks Tracker[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -38,6 +39,7 @@ model Client {
   thumbnail String?
   organizationId String
   organization Organization @relation(fields: [organizationId], references: [id])
+  trackers Tracker[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
@@ -47,10 +49,26 @@ model Organization {
   id String @id @default(uuid())
   name String
 
-  invite_code String @unique
+  inviteCode String @unique
   members Member[]
   clients Client[]
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model Tracker {
+  id String @id @default(uuid())
+  lastToggledOn DateTime @db.Timestamptz @default(now())
+  beforeDuration Int  @default(0)
+  isToggledOn Boolean @default(true)
+
+  memberId String
+  member Member @relation(fields: [memberId], references: [id])
+  clientId String
+  client Client @relation(fields: [clientId], references: [id])
+
+  createdFor DateTime @db.Timestamptz
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
 }
