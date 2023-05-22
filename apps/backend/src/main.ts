@@ -12,8 +12,10 @@ import * as secureSession from '@fastify/secure-session';
 import { ConfigService } from '@nestjs/config';
 import { SwaggerTheme } from 'swagger-themes';
 
+export let app: NestFastifyApplication;
+
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
+  app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({ ignoreTrailingSlash: true }),
   );
@@ -42,6 +44,7 @@ async function bootstrap() {
   );
 
   const configService = app.get<ConfigService>(ConfigService);
+  // @ts-ignore
   await app.register(secureSession, {
     secret: configService.getOrThrow('APP_SECRET'),
     salt: configService.getOrThrow('APP_SALT'),

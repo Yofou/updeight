@@ -7,9 +7,10 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { Member } from '../decorator/member.decorator';
+import { Member, MemberGuard } from '../decorator/member.decorator';
 import { MemberWithOrg } from '../session/session.types';
 import { OptionalIntPipe } from '../decorator/OptionalIntPipe.decorator';
 import { ResponseService } from '../response/response.service';
@@ -19,6 +20,7 @@ import { TrackerService } from './tracker.service';
 @Controller({
   path: 'tracker',
 })
+@UseGuards(MemberGuard)
 export class TrackerController {
   constructor(
     private readonly service: TrackerService,
@@ -26,7 +28,7 @@ export class TrackerController {
   ) {}
 
   @Get()
-  async getAll(
+  async read(
     @Member() member: MemberWithOrg,
     @Query('month', new OptionalIntPipe()) month: number,
     @Query('year', new OptionalIntPipe())
@@ -85,7 +87,7 @@ export class TrackerController {
     @Body() body: UpdateTrackerDto,
   ) {
     Logger.log(`Hitting UPDATE tracker`, trace);
-    const trackers = this.service.update(id, body, member, trace);
+    const trackers = await this.service.update(id, body, member, trace);
 
     return this.formatter.formatSuccess(trackers);
   }

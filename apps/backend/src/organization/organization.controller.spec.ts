@@ -4,10 +4,12 @@ import { OrganizationService } from './organization.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
 import { findFirst } from './organization.mock';
-import { findFirst as findFirstMember } from '../member/member.mock';
+import {
+  findFirst as findFirstMember,
+  findFirstWithOrg,
+} from '../member/member.mock';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { getSessionMock } from '../session/session.mock';
 import { SessionService } from '../session/session.service';
 import { SchedulerRegistry } from '@nestjs/schedule';
 
@@ -44,9 +46,7 @@ describe('OrganizationController', () => {
           .fn()
           .mockReturnValueOnce({ member: findFirstMember });
         await expect(
-          organizationController.read(
-            getSessionMock({ get: { id: 'test id' } }),
-          ),
+          organizationController.read({ ...findFirstWithOrg }),
         ).resolves.toMatchObject(formatter.formatSuccess(response));
       });
 
@@ -59,10 +59,7 @@ describe('OrganizationController', () => {
           .fn()
           .mockReturnValueOnce({ member: findFirstMember });
         await expect(
-          organizationController.read(
-            getSessionMock({ get: { id: 'test id' } }),
-            findFirst.id,
-          ),
+          organizationController.read({ ...findFirstWithOrg }, findFirst.id),
         ).resolves.toMatchObject(response);
       });
     });
@@ -75,10 +72,7 @@ describe('OrganizationController', () => {
           .mockReturnValueOnce({ member: findFirstMember });
 
         await expect(
-          organizationController.read(
-            getSessionMock({ get: { id: 'test id' } }),
-            findFirst.id,
-          ),
+          organizationController.read({ ...findFirstWithOrg }, findFirst.id),
         ).rejects.toThrow(NotFoundException);
       });
     });

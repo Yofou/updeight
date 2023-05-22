@@ -1,5 +1,7 @@
-/* declare module '@fastify/secure-session' {
-  interface SessionData {
-    id: string;
+import fastify from 'fastify';
+
+declare module 'fastify' {
+  export interface FastifyRequest {
+    member: import('./session.types').MemberWithOrg;
   }
-} */
+}

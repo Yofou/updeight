@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { CreateOrganizationDTO, OrganizationDTO } from './organization.dto';
@@ -18,12 +19,13 @@ import {
   getGeneralResponse,
 } from '../response/response.swagger';
 import { ResponseService } from '../response/response.service';
-import { Member } from '../decorator/member.decorator';
+import { Member, MemberGuard } from '../decorator/member.decorator';
 import { MemberWithOrg } from '../session/session.types';
 
 @Controller({
   path: 'organization',
 })
+@UseGuards(MemberGuard)
 export class OrganizationController {
   constructor(
     private orgService: OrganizationService,

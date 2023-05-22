@@ -3,7 +3,7 @@ import { MemberController } from './member.controller';
 import { MemberService } from './member.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ResponseService } from '../response/response.service';
-import { findFirst } from './member.mock';
+import { findFirst, findFirstWithOrg } from './member.mock';
 import {
   BadRequestException,
   NotFoundException,
@@ -21,9 +21,7 @@ describe('MemberController', () => {
   let prisma: PrismaService;
   let formatter: ResponseService;
   const baseMockSessionData = {
-    get: {
-      id: findFirst.id,
-    },
+    get: { ...findFirstWithOrg },
   };
 
   beforeEach(async () => {
@@ -49,7 +47,7 @@ describe('MemberController', () => {
         };
         prisma.session.findFirst = jest.fn().mockReturnValueOnce(response);
         await expect(
-          memberController.read(getSessionMock(baseMockSessionData)),
+          memberController.read({ ...findFirstWithOrg }),
         ).resolves.toMatchObject(formatter.formatSuccess(response.member));
       });
 
@@ -60,10 +58,7 @@ describe('MemberController', () => {
           .mockReturnValueOnce({ member: findFirst });
         prisma.member.findFirst = jest.fn().mockReturnValueOnce(findFirst);
         await expect(
-          memberController.read(
-            getSessionMock(baseMockSessionData),
-            findFirst.id,
-          ),
+          memberController.read({ ...findFirstWithOrg }, findFirst.id),
         ).resolves.toMatchObject(response);
       });
 
@@ -77,7 +72,7 @@ describe('MemberController', () => {
 
         await expect(
           memberController.read(
-            getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg },
             undefined,
             '<organization-id>',
           ),
@@ -93,10 +88,7 @@ describe('MemberController', () => {
         prisma.member.findFirst = jest.fn().mockReturnValue(null);
 
         await expect(
-          memberController.read(
-            getSessionMock(baseMockSessionData),
-            findFirst.id,
-          ),
+          memberController.read({ ...findFirstWithOrg }, findFirst.id),
         ).rejects.toThrow(BadRequestException);
       });
 
@@ -109,7 +101,7 @@ describe('MemberController', () => {
 
         await expect(
           memberController.read(
-            getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg },
             undefined,
             '<organization-id>',
           ),
@@ -235,7 +227,7 @@ describe('MemberController', () => {
 
         expect(
           await memberController.update(
-            getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg },
             findFirst.id,
             undefined,
             {
@@ -251,13 +243,13 @@ describe('MemberController', () => {
         const updatedFindFirst = { ...findFirst, name: 'yofou321' };
         prisma.session.findFirst = jest.fn().mockReturnValueOnce({
           ...findFirstSession,
-          member: { ...findFirst, id: '<other-id>' },
+          member: { ...findFirstWithOrg, id: '<other-id>' },
         });
         prisma.member.update = jest.fn().mockReturnValueOnce(updatedFindFirst);
 
         expect(
           memberController.update(
-            getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg, id: '<other-id>' },
             findFirst.id,
             undefined,
             {
@@ -274,7 +266,7 @@ describe('MemberController', () => {
       it("should delete it's own member & session if no id provided", async () => {
         prisma.session.findFirst = jest.fn().mockReturnValueOnce({
           ...findFirstSession,
-          member: findFirst,
+          member: { ...findFirstWithOrg },
         });
         prisma.session.deleteMany = jest.fn();
         prisma.member.deleteMany = jest.fn().mockReturnValueOnce({ count: 1 });
@@ -282,7 +274,7 @@ describe('MemberController', () => {
         expect(
           await memberController.del(
             getSessionMock(baseMockSessionData),
-            undefined,
+            { ...findFirstWithOrg },
             undefined,
           ),
         ).toMatchObject(formatter.formatSuccess(true));
@@ -299,6 +291,7 @@ describe('MemberController', () => {
         expect(
           await memberController.del(
             getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg },
             findFirst.id,
             undefined,
           ),
@@ -318,6 +311,7 @@ describe('MemberController', () => {
         expect(
           memberController.del(
             getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg },
             'bad actor deleting another members id',
             undefined,
           ),
@@ -335,6 +329,7 @@ describe('MemberController', () => {
         expect(
           memberController.del(
             getSessionMock(baseMockSessionData),
+            { ...findFirstWithOrg },
             undefined,
             undefined,
           ),

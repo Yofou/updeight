@@ -1,5 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Member } from 'prisma';
+import { MemberWithOrg } from '../session/session.types';
+import { findFirst as findFirstOrg } from '../organization/organization.mock';
 
 export const findFirst: Omit<Member, 'password'> = {
   id: randomUUID(),
@@ -10,3 +12,8 @@ export const findFirst: Omit<Member, 'password'> = {
 };
 
 export const findMany = [findFirst];
+
+export const findFirstWithOrg: MemberWithOrg = {
+  ...findFirst,
+  organizations: [findFirstOrg],
+};

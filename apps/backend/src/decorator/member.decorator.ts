@@ -1,21 +1,25 @@
 import {
+  CanActivate,
   createParamDecorator,
   ExecutionContext,
+  Injectable,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { FastifyRequest } from 'fastify';
 import { PrismaService } from '../prisma/prisma.service';
 
-export const Member = createParamDecorator(
-  async (_: string, ctx: ExecutionContext) => {
+@Injectable()
+export class MemberGuard implements CanActivate {
+  constructor(private prisma: PrismaService) {}
+
+  async canActivate(ctx: ExecutionContext) {
     const request = ctx.switchToHttp().getRequest<FastifyRequest>();
     const trace = request.query['trace-id'];
     const sessionId: string = request.session.get('id');
-    const prisma = new PrismaService();
 
     Logger.log(`Attempting to find session with the id of ${sessionId}`, trace);
-    const response = await prisma.session.findFirst({
+    const response = await this.prisma.session.findFirst({
       where: {
         id: sessionId ?? '',
       },
@@ -44,6 +48,15 @@ export const Member = createParamDecorator(
       trace,
     );
     Logger.debug(response?.member, trace);
-    return response?.member;
+    request.member = response.member;
+
+    return true;
+  }
+}
+
+export const Member = createParamDecorator(
+  async (_: string, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest<FastifyRequest>();
+    return request.member;
   },
 );

@@ -8,7 +8,7 @@ type MockedSessionResponse = {
   changed: boolean;
   deleted: boolean;
   get: {
-    [key: Key]: string;
+    [key: Key]: any;
   };
 };
 

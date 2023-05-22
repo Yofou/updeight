@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   Session,
+  UseGuards,
 } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { SessionService } from '../session/session.service';
@@ -30,7 +31,7 @@ import {
   GeneralResponseWithBooleanData,
   getGeneralResponse,
 } from '../response/response.swagger';
-import { Member } from '../decorator/member.decorator';
+import { Member, MemberGuard } from '../decorator/member.decorator';
 import { MemberWithOrg } from '../session/session.types';
 
 @Controller({
@@ -68,6 +69,7 @@ export class MemberController {
     type: 'string',
     required: false,
   })
+  @UseGuards(MemberGuard)
   @Get()
   async read(
     @Member() member: MemberWithOrg,
@@ -184,6 +186,7 @@ export class MemberController {
     type: 'string',
     required: false,
   })
+  @UseGuards(MemberGuard)
   @Put()
   async update(
     @Member() member: MemberWithOrg,
@@ -192,7 +195,7 @@ export class MemberController {
     @Body() body: UpdateMemberDto,
   ) {
     Logger.log('Hitting the UPDATE operation on member', trace);
-    return this.service.updateMember(id, body, member, trace);
+    return await this.service.updateMember(id, body, member, trace);
   }
 
   @ApiOperation({
@@ -213,6 +216,7 @@ export class MemberController {
     type: 'string',
     required: false,
   })
+  @UseGuards(MemberGuard)
   @Delete()
   async del(
     @Session() session: SessionData,
